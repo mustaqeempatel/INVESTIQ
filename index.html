@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="INVESTIQ - Global Investment Research & Portfolio Intelligence Workspace. Connect market discovery with portfolio context, risk visibility, watchlists, and data-driven insights.">
+  <title>INVESTIQ — Global Investment Intelligence Workspace</title>
+  
+  <!-- Design System & Component Styles -->
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages.css">
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%2300F0FF'/><path d='M30 65 L45 35 L60 55 L75 25' stroke='%2307090E' stroke-width='8' fill='none'/></svg>">
+</head>
+<body>
+  <!-- Ambient Spatial Glows & Grid Mesh -->
+  <div class="bg-ambient-glow" aria-hidden="true">
+    <div class="glow-orb-1"></div>
+    <div class="glow-orb-2"></div>
+    <div class="glow-grid"></div>
+  </div>
+
+  <div id="app">
+    <!-- ======================================================================
+         TOPBAR (Global Indices, Search, Currency, Notifications, User)
+         ====================================================================== -->
+    <header class="workspace-topbar" id="appTopbar">
+      <div class="topbar-left">
+        <!-- Brand on Topbar (visible when on landing or collapsed) -->
+        <a href="#landing" class="brand-badge" id="topbarBrandLink">
+          <div class="brand-icon-3d">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+              <polyline points="16 7 22 7 22 13"></polyline>
+            </svg>
+          </div>
+          <span class="brand-text">INVESTIQ <span class="brand-pill">SIM</span></span>
+        </a>
+
+        <!-- Active View Title Box -->
+        <div class="module-title-box" id="moduleTitleBox" style="display: none;">
+          <h1 class="module-heading" id="currentViewTitle">Dashboard</h1>
+          <span class="module-subheading" id="currentViewSubtitle">Portfolio Overview & Market Intelligence</span>
+        </div>
+
+        <!-- Global Market Indices Ribbon -->
+        <div class="ticker-ribbon" id="tickerRibbon" aria-label="Global Market Indices Ticker">
+          <!-- Populated by JavaScript -->
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <!-- Global Search (Ctrl+K) -->
+        <button class="global-search-btn" id="globalSearchTrigger" title="Search companies, symbols, sectors (Ctrl+K)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <span>Search markets...</span>
+          <kbd class="search-kbd">⌘K</kbd>
+        </button>
+
+        <!-- Currency Switcher -->
+        <select class="currency-selector-select" id="currencySelector" aria-label="Preferred Display Currency">
+          <option value="USD">USD ($)</option>
+          <option value="INR">INR (₹)</option>
+          <option value="EUR">EUR (€)</option>
+          <option value="GBP">GBP (£)</option>
+          <option value="JPY">JPY (¥)</option>
+        </select>
+
+        <!-- Notification Bell Trigger -->
+        <button class="icon-action-btn" id="notifBellBtn" title="Notification Center" aria-label="Notifications">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          <span class="badge-dot" id="notifUnreadDot" style="display: none;"></span>
+        </button>
+
+        <!-- Theme Toggle (Dark / Light) -->
+        <button class="icon-action-btn" id="themeToggleBtn" title="Toggle Dark/Light Mode" aria-label="Theme Toggle">
+          <svg id="themeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+
+        <!-- Demo Persona Quick Selector -->
+        <select class="form-select btn-sm" id="personaQuickSwitch" aria-label="Switch Demo User Persona" style="font-size: 0.78rem; padding: 6px 10px;">
+          <option value="alex_morgan">Alex Morgan (Balanced Tech)</option>
+          <option value="priya_sharma">Priya Sharma (Multi-Asset India & US)</option>
+          <option value="marcus_vance">Marcus Vance (Defensive Value)</option>
+        </select>
+
+        <!-- Workspace / Landing Quick Toggle CTA -->
+        <button class="btn btn-primary btn-sm" id="headerWorkspaceCta">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+          <span id="headerCtaText">Workspace</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ======================================================================
+         MAIN APP CONTAINER (Sidebar + Dynamic Viewport)
+         ====================================================================== -->
+    <div class="workspace-layout">
+      <!-- Persistent Sidebar -->
+      <aside class="workspace-sidebar" id="appSidebar">
+        <div class="sidebar-header">
+          <a href="#dashboard" class="brand-badge">
+            <div class="brand-icon-3d">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5">
+                <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+                <polyline points="16 7 22 7 22 13"></polyline>
+              </svg>
+            </div>
+            <div class="brand-text">
+              INVESTIQ
+              <span class="brand-pill">AI</span>
+            </div>
+          </a>
+        </div>
+
+        <!-- Sidebar User Mini Pill -->
+        <div class="sidebar-user-card" id="sidebarUserCard">
+          <div class="user-avatar" id="sidebarUserAvatar">AM</div>
+          <div class="user-info-mini">
+            <div class="user-name-text" id="sidebarUserName">Alex Morgan</div>
+            <div class="user-portfolio-val" id="sidebarPortfolioVal">$48,250.40</div>
+          </div>
+        </div>
+
+        <!-- Sidebar Navigation Links -->
+        <nav class="sidebar-nav" aria-label="Main Navigation">
+          <span class="nav-section-label">Intelligence</span>
+          <a class="nav-item active" data-view="dashboard" role="button">
+            <span class="nav-item-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="9"></rect>
+                <rect x="14" y="3" width="7" height="5"></rect>
+                <rect x="14" y="12" width="7" height="9"></rect>
+                <rect x="3" y="16" width="7" height="5"></rect>
+              </svg>
+            </span>
+            <span>Dashboard</span>
+          </a>
+
+          <a class="nav-item" data-view="markets" role="button">
+            <span class="nav-item-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+              </svg>
+            </span>
+            <span>Global Markets</span>
+          </a>
+
+          <a class="nav-item" data-view="scanner" role="button">
+            <span class="nav-item-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M2 12h20M12 2v20"></path>
+                <circle cx="12" cy="12" r="7"></circle>
+              </svg>
+            </span>
+            <span>Company Scanner</span>
+          </a>
+
+          <a class="nav-item" data-view="research" role="button">
+            <span class="nav-item-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+              </svg>
+            </span>
+            <span>Company Research</span>
+          </a>
+
+          <a class="nav-item" data-view="compare" role="button">
+            <span class="nav-item-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 3h5v5"></path>
+                <path d="M4 20L21 3"></path>
+                <path d="M21 16v5h-5"></path>
+                <path d="M15 15l6 6"></path>
+                <path d="M4 4l5 5"></path>
+              </svg>
+            </span>
+            <span>Compare</span>
+          </a>
+
+          <a class="nav-item" data-view="watchlist" role="button">
+            <span class="nav-item-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
+            </span>
+            <span>Watchlist</span>
+            <span class="nav-badge-count" id="sidebarWatchlistCount">8</span>
+          </a>
+
+          <span class="nav-section-label">Portfolio & Risk</span>
+          <a class="nav-item" data-view="portfolio" role="button">
+            <span class="nav-item-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+              </svg>
+            </span>
+            <span>Portfolio</span>
+          </a>
+
+          <a class="nav-item" data-view="transactions" role="button">
+            <span class="nav-item-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="1" x2="12" y2="23"></line>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+              </svg>
+            </span>
+            <span>Transactions</span>
+          </a>
+
+          <a class="nav-item" data-view="analytics" role="button">
+            <span class="nav-item-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="20" x2="18" y2="10"></line>
+                <line x1="12" y1="20" x2="12" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="14"></line>
+              </svg>
+            </span>
+            <span>Analytics</span>
+          </a>
+
+          <a class="nav-item" data-view="risk" role="button">
+            <span class="nav-item-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+            </span>
+            <span>Risk Analysis</span>
+          </a>
+
+          <a class="nav-item" data-view="alerts" role="button">
+            <span class="nav-item-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+            </span>
+            <span>Alerts</span>
+          </a>
+
+          <a class="nav-item" data-view="insights" role="button">
+            <span class="nav-item-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+            </span>
+            <span>Insights Engine</span>
+          </a>
+
+          <span class="nav-section-label">System</span>
+          <a class="nav-item" data-view="settings" role="button">
+            <span class="nav-item-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              </svg>
+            </span>
+            <span>Settings</span>
+          </a>
+
+          <a class="nav-item" data-view="landing" role="button">
+            <span class="nav-item-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+              </svg>
+            </span>
+            <span>Landing Page</span>
+          </a>
+        </nav>
+
+        <div class="sidebar-footer">
+          <div class="system-status-indicator">
+            <span class="status-dot-pulse"></span>
+            <span>Simulated Engine Active</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Dynamic Viewport -->
+      <main class="workspace-main" id="mainViewport">
+        <div class="viewport-content" id="viewContainer">
+          <!-- Dynamic Views will be injected here via JavaScript -->
+        </div>
+      </main>
+    </div>
+
+    <!-- ======================================================================
+         MOBILE BOTTOM NAVIGATION (Max-width: 640px)
+         ====================================================================== -->
+    <nav class="mobile-bottom-nav" aria-label="Mobile Navigation">
+      <a class="mobile-nav-item active" data-view="dashboard">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+        <span>Home</span>
+      </a>
+      <a class="mobile-nav-item" data-view="markets">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line></svg>
+        <span>Markets</span>
+      </a>
+      <a class="mobile-nav-item" data-view="portfolio">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+        <span>Portfolio</span>
+      </a>
+      <a class="mobile-nav-item" data-view="alerts">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+        <span>Alerts</span>
+      </a>
+      <a class="mobile-nav-item" data-view="settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        <span>Settings</span>
+      </a>
+    </nav>
+  </div>
+
+  <!-- ======================================================================
+       GLOBAL SEARCH MODAL (Ctrl+K)
+       ====================================================================== -->
+  <div class="modal-backdrop" id="searchModalBackdrop" role="dialog" aria-modal="true" aria-labelledby="searchModalTitle">
+    <div class="modal-window" style="max-width: 640px;">
+      <div class="modal-header" style="padding: 14px 20px;">
+        <div class="search-input-wrap" style="width: 100%;">
+          <svg class="search-input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="globalSearchInput" class="form-input" placeholder="Search company, ticker, exchange, sector (e.g. AAPL, Reliance, Tech)..." autocomplete="off" style="font-size: 1rem; border: none; background: transparent;">
+        </div>
+        <button class="modal-close-btn" id="closeSearchModalBtn" aria-label="Close search">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 12px 20px; max-height: 380px; overflow-y: auto;">
+        <div id="searchResultsList" style="display: flex; flex-direction: column; gap: 8px;">
+          <!-- Search results dynamically rendered -->
+        </div>
+      </div>
+      <div class="modal-footer" style="padding: 10px 20px; font-size: 0.75rem; color: var(--text-tertiary); justify-content: space-between;">
+        <span>Tip: Press <strong>ESC</strong> to dismiss or click result to open research</span>
+        <span class="mono">INVESTIQ GLOBAL FEED</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       SIMULATED TRANSACTION MODAL (Buy / Sell)
+       ====================================================================== -->
+  <div class="modal-backdrop" id="transactionModalBackdrop" role="dialog" aria-modal="true" aria-labelledby="txModalTitle">
+    <div class="modal-window" style="max-width: 520px;">
+      <div class="modal-header">
+        <h2 class="modal-title" id="txModalTitle">Execute Simulated Order</h2>
+        <button class="modal-close-btn" id="closeTxModalBtn" aria-label="Close modal">&times;</button>
+      </div>
+      <form id="simulatedTxForm">
+        <div class="modal-body">
+          <div class="tab-group" style="width: 100%; justify-content: center; margin-bottom: 8px;">
+            <button type="button" class="tab-btn active" id="txTabBuy" style="flex: 1; text-align: center;">Simulated Buy</button>
+            <button type="button" class="tab-btn" id="txTabSell" style="flex: 1; text-align: center;">Simulated Sell</button>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="txSymbolSelect">Target Asset (Company / Symbol)</label>
+            <select class="form-select" id="txSymbolSelect" required>
+              <!-- Populated via JS -->
+            </select>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label class="form-label" for="txQuantityInput">Quantity (Shares)</label>
+              <input type="number" id="txQuantityInput" class="form-input" min="1" step="1" value="10" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="txPriceInput">Execution Price (USD $)</label>
+              <input type="number" id="txPriceInput" class="form-input" min="0.01" step="0.01" value="150.00" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="txDateInput">Simulation Date</label>
+            <input type="date" id="txDateInput" class="form-input">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="txNotesInput">Investment Hypothesis / Notes</label>
+            <input type="text" id="txNotesInput" class="form-input" placeholder="e.g. Scaling into Q3 cloud demand thesis">
+          </div>
+
+          <!-- Order Summary Card -->
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 12px; display: flex; flex-direction: column; gap: 6px; font-size: 0.82rem;">
+            <div style="display: flex; justify-content: space-between;">
+              <span class="text-tertiary">Estimated Total Value:</span>
+              <span class="mono font-bold" id="txEstimatedTotal" style="font-size: 1rem; color: var(--brand-cyan);">$1,500.00</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.75rem;">
+              <span class="text-tertiary">Impact:</span>
+              <span class="text-secondary" id="txImpactNotice">Holdings, P&L, Risk & Allocation will recalculate immediately.</span>
+            </div>
+          </div>
+
+          <div style="font-size: 0.72rem; color: var(--text-tertiary); line-height: 1.4;">
+            <strong>Simulation Platform Notice:</strong> No actual financial transactions or brokerage orders will be executed. All changes update local portfolio models.
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancelTxBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="submitTxBtn">Execute Simulated Order</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       CREATE ALERT MODAL
+       ====================================================================== -->
+  <div class="modal-backdrop" id="alertModalBackdrop" role="dialog" aria-modal="true" aria-labelledby="alertModalTitle">
+    <div class="modal-window" style="max-width: 480px;">
+      <div class="modal-header">
+        <h2 class="modal-title" id="alertModalTitle">Create Market Monitoring Alert</h2>
+        <button class="modal-close-btn" id="closeAlertModalBtn" aria-label="Close modal">&times;</button>
+      </div>
+      <form id="createAlertForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="alertSymbolSelect">Target Asset</label>
+            <select class="form-select" id="alertSymbolSelect" required></select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="alertTypeSelect">Trigger Condition</label>
+            <select class="form-select" id="alertTypeSelect" required>
+              <option value="PRICE_ABOVE">Price Rises Above Target (USD $)</option>
+              <option value="PRICE_BELOW">Price Drops Below Target (USD $)</option>
+              <option value="PERCENT_MOVE">Intraday Movement Crosses (± %)</option>
+              <option value="VOLATILITY_EXPANSION">30D Volatility Exceeds (%)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="alertThresholdInput">Threshold Value</label>
+            <input type="number" id="alertThresholdInput" class="form-input" step="0.1" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancelAlertBtn">Cancel</button>
+          <button type="submit" class="btn btn-accent">Activate Alert</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Notification Drawer Dropdown -->
+  <div id="notifDrawer" style="display: none; position: fixed; top: 72px; right: 24px; width: 360px; max-height: 480px; background: var(--bg-card); border: 1px solid var(--border-bright); border-radius: var(--radius-lg); box-shadow: var(--shadow-3d); z-index: 1000; overflow-y: auto; flex-direction: column;">
+    <div style="padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between;">
+      <span style="font-weight: 700; font-size: 0.9rem;">Notification Center</span>
+      <button class="btn btn-ghost btn-sm" id="markAllReadBtn" style="font-size: 0.72rem; padding: 2px 6px;">Mark all read</button>
+    </div>
+    <div id="notifDrawerList" style="display: flex; flex-direction: column; padding: 8px;">
+      <!-- Populated via JS -->
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/market-data.js"></script>
+  <script src="js/risk-engine.js"></script>
+  <script src="js/insights-engine.js"></script>
+  <script src="js/chart-engine.js"></script>
+  <script src="js/hero-3d.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
