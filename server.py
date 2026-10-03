@@ -478,7 +478,7 @@ class InvestIQRequestHandler(SimpleHTTPRequestHandler):
 
 if __name__ == "__main__":
     print(f"Starting INVESTIQ Server on http://localhost:{PORT}")
-    server = HTTPServer(("127.0.0.1", PORT), InvestIQRequestHandler)
+    server = HTTPServer(("0.0.0.0", PORT), InvestIQRequestHandler)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
